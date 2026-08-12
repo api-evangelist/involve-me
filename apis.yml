@@ -1,0 +1,29 @@
+aid: involve-me
+name: involve.me
+description: involve.me is an AI quiz, form and funnel builder with email automation, used by marketing
+  teams to capture and qualify leads. Surfaced via the programmable-marketing integration graph.
+url: https://raw.githubusercontent.com/api-evangelist/involve-me/refs/heads/main/apis.yml
+x-type: company
+x-source: harvest:marketing-integration-graph
+x-tier: stub
+x-tier-reason: harvest
+specificationVersion: '0.20'
+created: '2026-08-12'
+modified: '2026-08-12'
+tags:
+- Company
+apis: []
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com
+- FN: APIs.json
+  email: info@apis.io
+common:
+- type: Website
+  url: https://www.involve.me/
+x-vouched-by:
+- Drip
+- MailerLite
+x-vouch-count: 2
+x-not-duplicate-of: involveai -- involve.ai is an AI customer-intelligence platform for customer success
+  teams; involve.me is a marketing funnel builder. Different companies, verified 2026-08-12.
