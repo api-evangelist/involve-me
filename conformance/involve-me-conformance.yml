@@ -1,0 +1,177 @@
+generated: '2026-08-12'
+method: searched
+source: >-
+  https://www.involve.me/blog/soc2-compliance (200, first-party announcement),
+  https://trust.involve.me/ (200, Vanta trust centre),
+  https://www.involve.me/privacy (200), https://www.involve.me/data-processing (200),
+  plus live probes of the /.well-known/ documents recorded in
+  well-known/involve-me-well-known.yml.
+description: >-
+  What involve.me actually conforms to. The compliance side is real and
+  independently attested — SOC 2 Type II plus GDPR, with a Vanta trust centre
+  behind it. The API-standards side is thin by construction: with no REST API there
+  is no JSON:API, RFC 9457, pagination or idempotency posture to assess, and the
+  only protocol conformance available is on the well-known and MCP surfaces.
+
+standards:
+
+  - id: soc2-type-ii
+    name: SOC 2 Type II
+    conforms: true
+    evidence: >-
+      involve.me announced SOC 2 Type II compliance in a first-party post dated
+      2026-07-01 (https://www.involve.me/blog/soc2-compliance), stating the audit
+      observed controls across several months rather than a point in time. The
+      report itself is released under NDA to Enterprise customers or prospects with
+      a signed engagement letter, via https://trust.involve.me/.
+    auditor: not published
+    date: '2026-07-01'
+    verified_publicly: >-
+      Announcement verified first-party; the attestation letter is not public, so
+      the certification is claimed-and-announced rather than independently readable.
+
+  - id: gdpr
+    name: GDPR (EU 2016/679)
+    conforms: true
+    evidence: >-
+      Stated in the SOC 2 post ("We're also fully compliant with GDPR"), and backed
+      by a published Data Processing Agreement at
+      https://www.involve.me/data-processing and a privacy policy at
+      https://www.involve.me/privacy. The operating entity, stereosense GmbH, is
+      EU-domiciled (imprint at https://www.involve.me/imprint) and webhook
+      deliveries originate from AWS eu-central-1.
+    relevance: >-
+      Material for this product: involve.me funnels collect zero-party personal
+      data by design, and the webhook payload carries a personal_data object.
+
+  - id: iso-27001
+    name: ISO/IEC 27001
+    conforms: unknown
+    evidence: >-
+      Not claimed in any first-party source found. The trust centre is a
+      client-rendered Vanta application whose framework list is not present in the
+      served HTML, so its contents could not be read anonymously. Recorded as
+      unknown rather than false.
+
+  - id: hipaa
+    name: HIPAA
+    conforms: unknown
+    evidence: Not claimed in any first-party source found.
+
+  - id: pci-dss
+    name: PCI DSS
+    conforms: not-applicable
+    evidence: >-
+      involve.me does not process card data itself — payment pages hand off to
+      Stripe and PayPal
+      (https://help.involve.me/en/articles/3206665-connect-stripe-for-payments), so
+      the cardholder-data environment sits with those processors.
+
+  - id: rfc9116
+    name: RFC 9116 — security.txt
+    conforms: true
+    evidence: >-
+      Valid security.txt served with a 200 at both
+      https://api.involve.me/.well-known/security.txt and
+      https://app.involve.me/.well-known/security.txt, carrying Contact, Expires,
+      Preferred-Languages and Canonical. Expires is in the future (2027-01-01), so
+      the document is live rather than stale.
+    deviations:
+      - No Policy: field, so there is no linked disclosure policy.
+      - No Encryption: key offered for confidential reports.
+      - Not served from the apex/www host, only from api. and app.
+
+  - id: rfc8414
+    name: RFC 8414 — OAuth 2.0 Authorization Server Metadata
+    conforms: true
+    evidence: >-
+      https://www.involve.me/.well-known/oauth-authorization-server returns 200
+      application/json with issuer, authorization_endpoint, token_endpoint,
+      registration_endpoint, revocation_endpoint, scopes_supported,
+      response_types_supported, grant_types_supported and
+      code_challenge_methods_supported.
+    deviations:
+      - >-
+        The document is served from www.involve.me but declares issuer
+        https://www-cdn.involve.me. RFC 8414 expects the metadata to be reachable
+        at the issuer's own well-known location; serving it from a different host
+        is a discovery convenience that a strict client may reject.
+
+  - id: rfc9728
+    name: RFC 9728 — OAuth 2.0 Protected Resource Metadata
+    conforms: true
+    evidence: >-
+      https://www.involve.me/.well-known/oauth-protected-resource returns 200 with
+      resource, authorization_servers[], scopes_supported and
+      bearer_methods_supported. The 401 from the MCP endpoint also returns a
+      spec-correct WWW-Authenticate challenge carrying resource_metadata.
+
+  - id: rfc7636
+    name: RFC 7636 — PKCE
+    conforms: true
+    evidence: code_challenge_methods_supported is ["S256"]; plain is not offered.
+
+  - id: rfc7591
+    name: RFC 7591 — Dynamic Client Registration
+    conforms: true
+    evidence: registration_endpoint published; client_id_metadata_document_supported true.
+
+  - id: mcp
+    name: Model Context Protocol
+    conforms: partial
+    evidence: >-
+      A live MCP server answers JSON-RPC at
+      https://www-cdn.involve.me/mcp/statamic with a spec-correct OAuth challenge.
+      Conformance beyond the authorization handshake (tools/list shape,
+      inputSchema quality, protocol version) could not be assessed — the surface is
+      gated. Scoped to the marketing website's CMS, not the involve.me product.
+
+  - id: a2a
+    name: A2A Agent Card
+    conforms: false
+    evidence: >-
+      /.well-known/agent-card.json and /.well-known/agent.json return 404 on
+      www.involve.me, app.involve.me and api.involve.me.
+
+  - id: openapi
+    name: OpenAPI
+    conforms: false
+    evidence: >-
+      No OpenAPI or Swagger document at any probed location on www., api., app. or
+      the (dead) developers. and docs. subdomains. See x-coverage in apis.yml.
+
+  - id: rfc9457
+    name: RFC 9457 — Problem Details for HTTP APIs
+    conforms: not-applicable
+    evidence: No public HTTP API, therefore no error envelope to profile.
+
+  - id: rfc8594
+    name: RFC 8594 — Sunset HTTP Header
+    conforms: false
+    evidence: No deprecation or sunset policy is published. See lifecycle/.
+
+  - id: oidc
+    name: OpenID Connect Discovery
+    conforms: false
+    evidence: >-
+      /.well-known/openid-configuration returns 404 on www. and app., despite SSO
+      being sold as an Enterprise feature.
+
+compliance_summary:
+  certifications_named: [SOC 2 Type II]
+  regulations_named: [GDPR]
+  trust_center: https://trust.involve.me/
+  dpa_published: https://www.involve.me/data-processing
+  subprocessors_published: unknown
+
+api_standards_summary:
+  openapi: false
+  asyncapi: false
+  graphql: false
+  json_schema: false
+  problem_details: not-applicable
+  idempotency: false
+  pagination: not-applicable
+  oauth2: true
+  mcp: true
+  a2a: false

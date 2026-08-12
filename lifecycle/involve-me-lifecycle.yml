@@ -1,0 +1,117 @@
+generated: '2026-08-12'
+method: searched
+source: >-
+  https://status.involve.me/ (200), https://www.involve.me/pricing (200),
+  https://www.involve.me/blog (200), plus 404 probes of /changelog,
+  /release-notes, /product-updates, /whats-new, /roadmap, feedback.involve.me and
+  roadmap.involve.me.
+description: >-
+  involve.me's operational lifecycle posture. One thing is genuinely in place — a
+  first-party status page on its own subdomain. Everything else an integrator needs
+  in order to depend on a platform (a versioning policy, a deprecation policy, an
+  SLA, a dated changelog, a public roadmap) is absent, which is consistent with a
+  company that has never shipped a public API contract to version or deprecate.
+
+status_page:
+  present: true
+  url: https://status.involve.me/
+  type: first-party (self-hosted, involve.me subdomain)
+  observed_state: 'No problems detected. | involve.me platform health'
+  http_status: 200
+  machine_readable_feed: false
+  feed_probe:
+    - url: https://status.involve.me/api/v2/status.json
+      status: 404
+    - url: https://status.involve.me/feed.rss
+      status: 404
+    - url: https://status.involve.me/history
+      status: 404
+  note: >-
+    Human-readable only. It is not a Statuspage.io/Atlassian instance, so the usual
+    /api/v2/status.json and RSS conventions do not apply and there is nothing an
+    agent or a monitoring pipeline can subscribe to. involve.statuspage.io also
+    resolves but is not the page linked from involve.me's own surfaces.
+
+versioning:
+  policy_published: false
+  scheme: null
+  note: >-
+    No API version to govern. The one versioned thing involve.me publishes is the
+    webhook envelope's "version": 1 field, which is stated in the payload
+    documentation but carries no accompanying policy about what a version bump
+    would mean or how it would be announced.
+
+deprecation:
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  notice_period: null
+  note: >-
+    No deprecation policy, no notice window and no Sunset/Deprecation header
+    practice. Historically relevant: the product was renamed from brandquiz to
+    involve.me, and the developers./docs./roadmap. subdomains that third-party
+    integration guides still cite now 302 to the marketing homepage with no notice
+    or redirect to a replacement — an undocumented retirement of a developer
+    surface is exactly what a deprecation policy exists to prevent.
+
+sla:
+  published: false
+  uptime_commitment: null
+  note: >-
+    No public SLA. Enterprise contracts are annual and negotiated
+    (https://www.involve.me/pricing), so any availability commitment lives in the
+    contract rather than on a public page.
+
+changelog:
+  dated_changelog: false
+  probes:
+    - url: https://www.involve.me/changelog
+      status: 404
+    - url: https://www.involve.me/release-notes
+      status: 404
+    - url: https://www.involve.me/product-updates
+      status: 404
+    - url: https://www.involve.me/whats-new
+      status: 404
+  nearest_equivalent:
+    url: https://www.involve.me/blog?category=product
+    type: blog category
+    note: >-
+      Product news is published as blog posts in a "product" category. That is
+      announcement copy, not a changelog: entries are not versioned, not
+      exhaustive, and carry no breaking/additive classification. See
+      changelog/involve-me-changelog.yml.
+
+roadmap:
+  published: false
+  probes:
+    - url: https://www.involve.me/roadmap
+      status: 404
+    - url: https://roadmap.involve.me/
+      status: 302
+      redirects_to: https://www.involve.me/
+    - url: https://feedback.involve.me/
+      status: 404
+  note: >-
+    roadmap.involve.me resolves into involve.me's own funnel-hosting edge and 302s
+    to the marketing homepage with utm_campaign=customer_organization-deleted — the
+    subdomain is being handled as a (missing) customer funnel organisation, not as
+    a roadmap site.
+
+deprecated_operations: []
+deprecated_operations_note: No OpenAPI exists from which to derive deprecated operations.
+
+support_lifecycle:
+  support_channel: https://www.involve.me/contact
+  help_center: https://help.involve.me/en/
+  security_contact: mailto:security@involve.me
+
+recommendations_to_provider:
+  - Publish a machine-readable status feed (JSON and/or RSS) from status.involve.me.
+  - >-
+    Publish a dated changelog separate from the marketing blog, classifying each
+    entry as breaking or additive.
+  - >-
+    Adopt a deprecation policy with a stated notice window before the next
+    developer-facing surface is retired the way developers.involve.me was.

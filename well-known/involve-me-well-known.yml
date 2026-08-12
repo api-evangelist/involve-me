@@ -1,0 +1,137 @@
+generated: '2026-08-12'
+method: probed
+source: >-
+  Direct HTTP probes of /.well-known/* across every involve.me host discovered in
+  STEP 0b — www.involve.me (marketing site + Statamic CMS), app.involve.me (the
+  product SPA), api.involve.me (the Laravel API host), and www-cdn.involve.me
+  (the CMS origin named by the OAuth metadata).
+description: >-
+  What involve.me actually serves under /.well-known/. Three real documents were
+  found: an RFC 9116 security.txt (served identically from api.involve.me and
+  app.involve.me, canonical on app.), and an RFC 8414 OAuth 2.0 authorization
+  server metadata document plus an RFC 9728 protected-resource metadata document
+  that together advertise a Model Context Protocol server. Everything else 404s.
+
+hosts_probed:
+  - https://www.involve.me
+  - https://app.involve.me
+  - https://api.involve.me
+  - https://www-cdn.involve.me
+
+probes:
+  - path: /.well-known/security.txt
+    host: https://app.involve.me
+    status: 200
+    content_type: text/plain;charset=UTF-8
+    document: true
+    file: well-known/involve-me-security.txt
+    note: >-
+      Real RFC 9116 document. Declares Contact: mailto:security@involve.me,
+      Expires 2027-01-01, Preferred-Languages en, and Canonical
+      https://app.involve.me/.well-known/security.txt. No Policy:, Encryption:,
+      Acknowledgments: or Hiring: field is published.
+
+  - path: /.well-known/security.txt
+    host: https://api.involve.me
+    status: 200
+    content_type: text/plain;charset=UTF-8
+    document: true
+    file: well-known/involve-me-security.txt
+    note: >-
+      Byte-identical to the app.involve.me copy; its own Canonical field points at
+      app.involve.me, so the app. copy is the one stored.
+
+  - path: /.well-known/security.txt
+    host: https://www.involve.me
+    status: 404
+    document: false
+
+  - path: /.well-known/oauth-authorization-server
+    host: https://www.involve.me
+    status: 200
+    content_type: application/json
+    document: true
+    file: well-known/involve-me-oauth-authorization-server.json
+    note: >-
+      RFC 8414 authorization server metadata. Issuer is https://www-cdn.involve.me
+      (not www.involve.me — the metadata is served from the public marketing host
+      but describes the CDN origin). Advertises authorization, token, registration
+      and revocation endpoints under /mcp/oauth/, PKCE S256, authorization_code +
+      refresh_token grants, dynamic client registration, and 20 named scopes.
+      See scopes/involve-me-scopes.yml.
+
+  - path: /.well-known/oauth-protected-resource
+    host: https://www.involve.me
+    status: 200
+    content_type: application/json
+    document: true
+    file: well-known/involve-me-oauth-protected-resource.json
+    note: >-
+      RFC 9728 protected-resource metadata. Names the protected resource as
+      https://www-cdn.involve.me/mcp/statamic — an MCP server. This is the only
+      machine-readable API contract pointer involve.me publishes anywhere.
+
+  - path: /.well-known/oauth-authorization-server
+    host: https://app.involve.me
+    status: 404
+    document: false
+
+  - path: /.well-known/openid-configuration
+    host: https://www.involve.me
+    status: 404
+    document: false
+
+  - path: /.well-known/api-catalog
+    host: https://www.involve.me
+    status: 404
+    document: false
+
+  - path: /.well-known/ai-plugin.json
+    host: https://www.involve.me
+    status: 404
+    document: false
+
+  - path: /.well-known/agent-card.json
+    host: https://www.involve.me
+    status: 404
+    document: false
+
+  - path: /.well-known/agent-card.json
+    host: https://api.involve.me
+    status: 404
+    document: false
+
+  - path: /.well-known/agent-card.json
+    host: https://app.involve.me
+    status: 404
+    document: false
+
+  - path: /.well-known/agent.json
+    host: https://www.involve.me
+    status: 404
+    document: false
+
+  - path: /.well-known/agent.json
+    host: https://app.involve.me
+    status: 404
+    document: false
+
+summary:
+  paths_probed: 15
+  documents_found: 4
+  security_txt: true
+  oauth_metadata: true
+  openid_configuration: false
+  api_catalog: false
+  ai_plugin: false
+  agent_card: false
+
+notes:
+  - >-
+    404s here are real 404s, not SPA catch-alls — involve.me's Caddy/Laravel edge
+    returns an HTML "Page Not Found" body with a 404 status, so there is no
+    soft-200 false-credit risk on this host.
+  - >-
+    No A2A agent card exists on any host. Per pipeline policy nothing was written
+    to a2a/ — an agent card is the one artifact that may never be authored on a
+    provider's behalf.

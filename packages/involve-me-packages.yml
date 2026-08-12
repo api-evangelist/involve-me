@@ -1,0 +1,97 @@
+generated: '2026-08-12'
+method: searched
+source: >-
+  registry.npmjs.org, pypi.org, repo.packagist.org, api.github.com/orgs/stereosense,
+  api.github.com/orgs/InvolveMe, and the involve.me help centre index in
+  https://www.involve.me/llms.txt. All queried unauthenticated on 2026-08-12.
+description: >-
+  involve.me ships no client libraries. There is no SDK on any package registry in
+  any language, and neither of the company's two GitHub organisations publishes a
+  first-party client — the public repos are forks of third-party libraries and
+  internal Laravel Nova UI packages, none of which is registered on Packagist or
+  npm under an involve.me identity. This is a recorded absence, not an unchecked field.
+
+official_sdk_count: 0
+package_count: 0
+packages: []
+
+registries_checked:
+  - registry: npm
+    queries: ['involve.me', 'involveme', 'involve-me', '@involve.me/embed', 'involveme-sdk']
+    result: no first-party package
+    status: 404
+  - registry: pypi
+    queries: [involveme]
+    result: no first-party package
+    status: 404
+  - registry: packagist
+    queries:
+      - stereosense/nova-status-field
+      - stereosense/nova-action-buttons
+      - stereosense/involveme-nova-metrics
+      - stereosense/device-detector
+    result: >-
+      404 on every one. The Laravel Nova packages exist as GitHub repos under the
+      stereosense org but are not published to Packagist, so they are not
+      installable and are not client libraries in any case.
+    status: 404
+  - registry: rubygems
+    result: not attempted — no Ruby surface documented anywhere
+  - registry: crates.io
+    result: not attempted — no Rust surface documented anywhere
+  - registry: maven-central
+    result: not attempted — no JVM surface documented anywhere
+  - registry: nuget
+    result: not attempted — no .NET surface documented anywhere
+  - registry: pkg.go.dev
+    result: not attempted — no Go surface documented anywhere
+
+github_organizations:
+  - login: stereosense
+    url: https://github.com/stereosense
+    website: https://www.involve.me
+    public_repos: 7
+    created: '2016-09-15'
+    first_party_client_libraries: 0
+    note: >-
+      The legal entity's org (stereosense GmbH operates involve.me). Contents are
+      forks of third-party libraries (device-detector, webfontloader,
+      public-suffix-list, vue-trend-chart) plus internal Laravel Nova admin
+      components (nova-status-field, nova-action-buttons, involveme-nova-metrics).
+      Nothing here is an involve.me API client.
+  - login: InvolveMe
+    url: https://github.com/InvolveMe
+    public_repos: 3
+    created: '2020-10-03'
+    first_party_client_libraries: 0
+    note: Forks of wink and larapex-charts, plus a .github workflow-templates repo.
+
+cdn_distribution:
+  - name: involve.me funnel embed loader
+    registry: cdn
+    version: null
+    published: null
+    url_pattern: https://<organization>.involve.me/embed
+    pinned: false
+    note: >-
+      CHECKED, NOTHING TO RECORD. The embed loader is served per-tenant from the
+      customer's own involve.me organisation subdomain and the URL carries no
+      version segment, hash or query parameter. There is no registry metadata
+      endpoint and no jsDelivr/unpkg mirror to query, and because the URL floats to
+      whatever the origin serves, a consumer cannot determine which build they
+      loaded either. That unpinnability IS the finding.
+    source: https://help.involve.me/en/articles/1567355-share-embed-your-funnel
+
+decay_signal:
+  assessable: false
+  note: >-
+    The strongest abandonment signal this pipeline collects is a first-party SDK
+    whose last release predates the API it wraps. involve.me publishes neither an
+    SDK nor an API, so there is nothing to date and no decay to measure. Absence
+    here is a structural fact about the company's developer posture, not a stale
+    release.
+
+recommendation_to_provider: >-
+  Version and pin the embed loader (an immutable, hashed URL on a CDN) so that
+  customers embedding involve.me on their own sites can pin a known build and audit
+  what executes in their page.

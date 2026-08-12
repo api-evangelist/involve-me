@@ -1,0 +1,79 @@
+generated: '2026-08-12'
+method: searched
+source: >-
+  https://trust.involve.me/ (HTTP 200, a Vanta-hosted trust report) and
+  https://www.involve.me/blog/soc2-compliance (HTTP 200, involve.me's own SOC 2
+  Type II announcement dated 2026-07-01).
+url: https://trust.involve.me/
+description: >-
+  involve.me operates a real trust centre on its own subdomain, hosted by Vanta
+  (EU tenant, app.eu.vanta.com). Its certification list is client-rendered and is
+  therefore NOT readable from the served HTML, so the certifications recorded below
+  are taken from involve.me's own first-party blog announcement rather than scraped
+  from the trust centre itself.
+
+provider: Vanta
+tenant_region: EU (app.eu.vanta.com)
+machine_readable: false
+machine_readable_note: >-
+  The served HTML is a 7.4 KB SPA shell; the trust report is assembled client-side
+  from assets.vanta.com bundles. No JSON endpoint, feed or server-rendered fallback
+  was found, so an agent visiting trust.involve.me learns nothing.
+
+certifications:
+- name: SOC 2 Type II
+  status: attested
+  date: '2026-07-01'
+  auditor: not published
+  report_access: >-
+    Under NDA, to Enterprise-plan customers or prospects with a signed engagement
+    letter; requested through the trust centre.
+  evidence: https://www.involve.me/blog/soc2-compliance
+- name: GDPR
+  status: compliance claimed
+  evidence: https://www.involve.me/blog/soc2-compliance
+  supporting:
+  - https://www.involve.me/data-processing
+  - https://www.involve.me/privacy
+  note: >-
+    stereosense GmbH is EU-domiciled (https://www.involve.me/imprint) and webhook
+    deliveries originate from AWS eu-central-1, so EU data residency is consistent
+    with the claim.
+
+not_claimed:
+- ISO 27001
+- ISO 27701
+- HIPAA
+- FedRAMP
+- PCI DSS
+not_claimed_note: >-
+  None of these appears in any first-party source found. They are recorded as
+  not-claimed rather than absent, because the trust centre's own framework list
+  could not be read.
+
+evidence:
+- url: https://trust.involve.me/
+  http_status: 200
+  content_type: text/html
+  observation: >-
+    og:title "involve.me Trust Center"; Vanta signature manifest and
+    index-trust-report bundle preloaded; no certification names in the served body.
+- url: https://www.involve.me/blog/soc2-compliance
+  http_status: 200
+  observation: >-
+    First-party announcement of SOC 2 Type II, explicitly contrasting Type II with
+    Type I, confirming GDPR compliance, and linking trust.involve.me for report access.
+
+x-correction:
+  date: '2026-08-12'
+  note: >-
+    This file replaces an automated probe result that was a FALSE POSITIVE. The
+    probe followed https://security.involve.me, which 302s into involve.me's own
+    funnel-hosting edge and lands on the MARKETING HOMEPAGE with
+    utm_campaign=customer_organization-deleted. The keyword matcher then found
+    "soc 2" and "gdpr" in that homepage's copy and recorded the redirected
+    marketing URL as a trust centre. security.involve.me is not a trust centre and
+    serves no security content; the real one is trust.involve.me.
+  bad_source: >-
+    https://www.involve.me/?utm_source=involveme&utm_medium=referral&utm_campaign=customer_organization-deleted&utm_content=security&utm_term=https%3A%2F%2Fsecurity.involve.me
+  bad_source_status: 200 (after a 302 from https://security.involve.me)

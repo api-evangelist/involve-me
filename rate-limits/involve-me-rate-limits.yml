@@ -1,0 +1,69 @@
+generated: '2026-08-12'
+method: searched
+source: >-
+  https://www.involve.me/pricing (200), https://help.involve.me/en/ (200), the
+  full llms.txt index at https://www.involve.me/llms.txt (200, 731 URLs across the
+  site and help centre), and live probes of https://api.involve.me/* (all 404).
+description: >-
+  involve.me publishes no rate limits, because it publishes no callable API. Every
+  documented quota is a subscription cap (live funnels, seats, AI credits,
+  submissions on Free), enforced by billing rather than by an HTTP rate limiter.
+  This file records an honest zero, not a gap in our search.
+
+limit_count: 0
+
+headers:
+  request: []
+  response: []
+  note: >-
+    No X-RateLimit-*, RateLimit-* or Retry-After header could be observed, because
+    there is no unauthenticated API endpoint on any involve.me host to observe one
+    on. api.involve.me answers 404 (HTML) at /, /v1, /v1/projects, /v1/me,
+    /v1/funnels, /v1/submissions, /health and /status.
+
+exhaustion_status_code: null
+
+limits: []
+
+quota_style_caps:
+  note: >-
+    These are plan entitlements, not rate limits. They are listed so a reader is
+    not misled into treating them as runtime throttles. See
+    plans/involve-me-plans-pricing.yml.
+  caps:
+  - scope: workspace
+    metric: submissions per month
+    value: 50
+    plan: Free
+  - scope: workspace
+    metric: visits per month
+    value: 500
+    plan: Free
+  - scope: workspace
+    metric: live funnels
+    values: {Start: 3, Grow: 5, Scale: 25, Enterprise: custom}
+  - scope: workspace
+    metric: users (seats)
+    values: {Start: 1, Grow: 2, Scale: 5, Enterprise: custom}
+  - scope: workspace
+    metric: AI credits per month
+    values: {Start: 50, Grow: 100, Scale: 300, Enterprise: custom}
+
+webhook_delivery_limits:
+  documented: false
+  note: >-
+    The outbound webhook surface publishes no delivery rate, no burst ceiling, no
+    retry budget and no timeout. See asyncapi/involve-me-webhooks.yml.
+
+mcp_limits:
+  documented: false
+  surface: https://www-cdn.involve.me/mcp/statamic
+  note: >-
+    The MCP server returns 401 before any rate-limit header is emitted, so no
+    runtime signal is observable anonymously.
+
+recommendation_to_provider: >-
+  Nothing to fix until an API exists. If one ships, emit RateLimit-Limit /
+  RateLimit-Remaining / RateLimit-Reset (draft-ietf-httpapi-ratelimit-headers) and
+  Retry-After on 429 — an agent needs the runtime signal, not a number in a
+  pricing table.

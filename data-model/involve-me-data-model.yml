@@ -1,0 +1,187 @@
+generated: '2026-08-12'
+method: derived
+source: >-
+  asyncapi/involve-me-webhooks.yml — the finished_participant payload documented at
+  https://help.involve.me/en/articles/2193514-receive-submission-data-with-webhooks-anywhere.
+  Entity names and cardinalities are inferred from that payload's nesting and from
+  involve.me's own product vocabulary; there is NO OpenAPI, JSON Schema or object
+  reference to derive from, so every relationship below is an honest inference from
+  one documented document shape, not a provider-published model.
+description: >-
+  The entity graph a machine actually sees from involve.me. It is reconstructed
+  from the single webhook payload — the only place involve.me publishes field names
+  — so it describes the submission side of the product well and the authoring side
+  (funnels, pages, elements, email sequences, contacts) only as far as that payload
+  reveals it.
+
+confidence: medium
+confidence_note: >-
+  High confidence in the fields and nesting, which are quoted from the provider's
+  own documentation. Medium confidence in entity boundaries and cardinality, which
+  are inferred. Low confidence in anything not represented in the payload.
+
+id_conventions:
+  observed: [participant_id, question.id, remote_id]
+  prefixed_ids: false
+  format: not published
+  note: >-
+    involve.me publishes no id format, no prefix scheme and no uniqueness or
+    stability guarantee for any identifier. participant_id is the de facto primary
+    key of a submission but is nowhere stated to be globally unique or immutable.
+
+entities:
+
+  - name: Project
+    aka: [Funnel]
+    description: >-
+      The unit customers build and publish — a quiz, form, survey, calculator,
+      landing page or payment page. Plan quotas are counted in "live funnels".
+    fields_observed: [project_name, project_url, embed_url]
+    identifier: none exposed in the payload (referenced by name and URL only)
+    relationships:
+      - has_many: Participant
+        via: implicit (each submission belongs to one project)
+      - has_many: Outcome
+        via: has_outcomes
+      - has_many: Question
+        via: implicit (the funnel's question set)
+
+  - name: Participant
+    aka: [Submission, Response]
+    description: >-
+      One person's pass through a funnel. The root object of the webhook payload's
+      data block; emitted when the participant reaches a final page.
+    identifier: participant_id
+    fields_observed:
+      - participant_id
+      - correctly_answered
+      - score
+      - calculator_result
+      - calculator_results
+      - has_outcomes
+      - outcome
+      - outcome_points
+      - country_code
+      - anonymized_ip
+      - seconds_to_complete
+      - device_type
+      - remote_id
+      - opened_at
+      - finished_at
+    relationships:
+      - belongs_to: Project
+        via: project_name / project_url
+      - has_one: PersonalData
+        via: personal_data
+      - has_many: Question
+        via: questions
+      - has_one: Outcome
+        via: outcome
+    lifecycle_note: >-
+      Partial submissions (abandoned mid-funnel) are a documented product feature
+      but are never emitted as an event, so this entity only ever reaches a webhook
+      subscriber in its completed state.
+
+  - name: PersonalData
+    description: >-
+      The identity fields a funnel collected — name, email, phone and any custom
+      contact fields. Shape is tenant-defined by the funnel's field configuration,
+      so it is an open map rather than a fixed schema.
+    schema: open / tenant-defined
+    pii: true
+    relationships:
+      - belongs_to: Participant
+        via: personal_data
+    note: >-
+      This is the object that makes involve.me a GDPR-material processor for its
+      customers, and it travels unsigned over the webhook. See
+      conformance/involve-me-conformance.yml and
+      asyncapi/involve-me-webhooks.yml#security.
+
+  - name: Question
+    description: One question as answered by one participant.
+    identifier: id
+    fields_observed: [id, type, question_text, answered_correctly, max_value, checked]
+    relationships:
+      - belongs_to: Participant
+        via: questions[]
+      - has_many: Answer
+        via: answers_given
+
+  - name: Answer
+    aka: [AnswerGiven]
+    description: >-
+      One answer to one question. Polymorphic — the field set present depends on the
+      question type (choice, rating, slider, file upload, free text).
+    polymorphic: true
+    variants:
+      choice: [response_text, response_image, response_icon, connected_outcome, correct, value]
+      rating: [rating_percent, rating_input, rating_max]
+      slider: [slider_input, slider_min, slider_max]
+      file: [file_url, file_name, file_bytes, file_type]
+    relationships:
+      - belongs_to: Question
+        via: answers_given[]
+      - references: Outcome
+        via: connected_outcome
+    note: >-
+      No discriminator field is documented. A consumer must infer the variant from
+      which keys are present, which is exactly the ambiguity a published schema
+      would remove.
+
+  - name: Outcome
+    description: >-
+      A terminal result page a participant is routed to — the segmentation primitive
+      behind lead scoring and product recommendation.
+    fields_observed: [outcome, outcome_points, has_outcomes, connected_outcome]
+    relationships:
+      - belongs_to: Project
+      - referenced_by: Answer
+        via: connected_outcome
+      - referenced_by: Participant
+        via: outcome
+
+  - name: Organization
+    aka: [Workspace, Account]
+    description: >-
+      The billing and hosting boundary. Owns funnels, seats and quotas, and gives
+      the funnel host its subdomain (<organization>.involve.me), which is also the
+      embed loader's origin.
+    fields_observed: []
+    inferred_from:
+      - https://help.involve.me/en/articles/5332278-how-to-change-your-involve-me-subdomain-and-organization-name
+      - the embed loader URL pattern
+      - the customer_organization-* redirect campaign on unresolved subdomains
+    relationships:
+      - has_many: Project
+      - has_many: User
+      - has_one: Subscription
+
+  - name: Contact
+    description: >-
+      The built-in CRM record a participant is promoted into, and the target of the
+      email-automation sequences. Sold on every paid tier.
+    exposure: none
+    note: >-
+      NOT represented in any published document. Listed because the product's own
+      marketing makes it a first-class entity ("built-in CRM", "contact profiles"),
+      and its complete absence from every machine-readable surface is itself the
+      finding: the data customers most want to sync out has no contract.
+    relationships:
+      - derived_from: Participant
+
+relationships_summary:
+  total_entities: 8
+  entities_with_published_fields: 6
+  entities_inferred_only: 2
+
+gaps:
+  - No id format, prefix scheme or uniqueness guarantee for any identifier.
+  - Answer is polymorphic with no discriminator.
+  - >-
+    PersonalData is an open, tenant-defined map — a consumer cannot write a typed
+    binding against it.
+  - >-
+    Contact, EmailSequence, Page and Element are real product entities with no
+    machine-readable representation anywhere.
+  - No subway/ ERD render exists for this repo.

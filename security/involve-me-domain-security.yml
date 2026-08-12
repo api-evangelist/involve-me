@@ -1,0 +1,22 @@
+generated: '2026-08-12'
+method: probed
+source: live DNS/TLS/HTTP probes of apis.yml + OpenAPI hosts
+hosts:
+- host: www.involve.me
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Oct 11 09:02:05 2026 GMT
+  hsts: true
+  hsts_max_age: 31536000
+- host: www-cdn.involve.me
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Sep 18 22:24:52 2026 GMT
+  hsts: false
+domains:
+- domain: involve.me
+  dnssec: false
+  caa: []
+  spf: true
+  dmarc: true
+  dmarc_policy: reject

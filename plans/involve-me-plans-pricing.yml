@@ -1,0 +1,123 @@
+generated: '2026-08-12'
+method: searched
+source: https://www.involve.me/pricing
+description: >-
+  involve.me's published subscription tiers, read from the public pricing page.
+  Pricing is per-workspace and seat-limited rather than usage-metered, with live
+  funnels and AI credits as the primary quotas. The two facts an integrator cares
+  about are gated high: webhooks require Scale, and SSO requires Enterprise.
+
+currency: USD
+billing_periods: [monthly, annual]
+annual_discount_claimed: '40%'
+pricing_url: https://www.involve.me/pricing
+plan_count: 5
+
+plans:
+  - name: Free
+    price_monthly: 0
+    price_annual_per_month: 0
+    currency: USD
+    quotas:
+      submissions_per_month: 50
+      visits_per_month: 500
+      note: 50 submissions OR 500 visits per month, whichever is reached first.
+    features:
+      webhooks: false
+      integrations: false
+      sso: false
+    note: Free forever with limited usage and features; integrations are paid-plan only.
+
+  - name: Start
+    price_monthly: 49
+    price_annual_per_month: 29
+    currency: USD
+    quotas:
+      live_funnels: 3
+      users: 1
+      ai_credits_per_month: 50
+    features:
+      quizzes_forms_surveys_calculators: true
+      email_automation: true
+      built_in_crm: true
+      integrations: '30+'
+      webhooks: false
+      sso: false
+
+  - name: Grow
+    price_monthly: 99
+    price_annual_per_month: 69
+    currency: USD
+    most_popular: true
+    quotas:
+      live_funnels: 5
+      users: 2
+      ai_credits_per_month: 100
+      custom_domains: 1
+    features:
+      inherits: Start
+      branding_removal: true
+      custom_domain: true
+      advanced_integrations: [HubSpot, Klaviyo]
+      webhooks: false
+      sso: false
+    seat_overage:
+      price_per_user_per_month: 10
+      currency: USD
+
+  - name: Scale
+    price_monthly: 199
+    price_annual_per_month: 139
+    currency: USD
+    quotas:
+      live_funnels: 25
+      users: 5
+      ai_credits_per_month: 300
+    features:
+      inherits: Grow
+      ab_testing: true
+      otp_verification: true
+      salesforce_integration: true
+      detailed_analytics: true
+      webhooks: true
+      sso: false
+    seat_overage:
+      price_per_user_per_month: 10
+      currency: USD
+    note: >-
+      The lowest tier on which involve.me's only programmatic outbound surface
+      (webhooks) is available.
+
+  - name: Enterprise
+    price_monthly: 499
+    price_annual_per_month: 499
+    price_qualifier: from
+    currency: USD
+    billing_note: Annual contracts only.
+    quotas:
+      live_funnels: custom
+      users: custom
+      ai_credits_per_month: custom
+    features:
+      inherits: Scale
+      sso: true
+      dedicated_onboarding: true
+      security_assessments: true
+      soc2_report_access: true
+    note: >-
+      The SOC 2 Type II report is released under NDA to Enterprise customers or
+      prospects with a signed engagement letter (per the provider's own SOC 2 post).
+
+overage:
+  model: none published
+  note: >-
+    involve.me does not publish per-submission overage pricing on paid tiers. Live
+    funnels, seats and AI credits are hard caps; exceeding them is handled by
+    upgrading, not by metered billing. Add-on seats at $10/user/month (Grow and
+    Scale) are the only published incremental charge.
+
+api_pricing:
+  metered_api: false
+  note: >-
+    There is no API product to price. No plan grants REST API access, because
+    involve.me publishes no public REST API.

@@ -1,0 +1,120 @@
+generated: '2026-08-12'
+method: probed
+source: >-
+  https://www.involve.me/.well-known/oauth-authorization-server (HTTP 200,
+  application/json) — scopes_supported, read verbatim. Corroborated by
+  https://www.involve.me/.well-known/oauth-protected-resource (HTTP 200), which
+  publishes the identical list for the protected resource
+  https://www-cdn.involve.me/mcp/statamic.
+description: >-
+  The OAuth 2.0 scopes involve.me publishes for its Model Context Protocol server.
+  These are read straight off RFC 8414 authorization-server metadata, so they are
+  the provider's own values — but note that no human-readable scope reference page
+  exists anywhere on involve.me, help.involve.me, or any developer site. The
+  descriptions below are marked derived and are inferred from Statamic CMS resource
+  naming; they are NOT provider-authored text.
+
+authorization_server: https://www-cdn.involve.me
+protected_resource: https://www-cdn.involve.me/mcp/statamic
+docs: null
+docs_note: >-
+  involve.me publishes no scopes/permissions reference. There is no developer
+  portal (developers.involve.me and docs.involve.me both 302 to the marketing
+  homepage). The only public record of these scopes is the .well-known metadata
+  document itself.
+
+pkce_required: S256
+grant_types: [authorization_code, refresh_token]
+scope_count: 20
+
+scopes:
+  - scope: '*'
+    description_method: provider
+    description: Wildcard — full access to every resource family below.
+    risk: high
+
+  - scope: content:read
+    description_method: derived
+    description: Read CMS content across all content types.
+  - scope: content:write
+    description_method: derived
+    description: Create, update and delete CMS content.
+
+  - scope: entries:read
+    description_method: derived
+    description: Read Statamic entries (individual pages, blog posts, templates).
+  - scope: entries:write
+    description_method: derived
+    description: Create, update and delete Statamic entries.
+
+  - scope: structures:read
+    description_method: derived
+    description: Read navigation structures and content trees.
+  - scope: structures:write
+    description_method: derived
+    description: Modify navigation structures and content trees.
+
+  - scope: assets:read
+    description_method: derived
+    description: Read media assets and asset containers.
+  - scope: assets:write
+    description_method: derived
+    description: Upload, replace and delete media assets.
+
+  - scope: users:read
+    description_method: derived
+    description: Read CMS user accounts and roles.
+    risk: high
+  - scope: users:write
+    description_method: derived
+    description: Create, update and delete CMS user accounts.
+    risk: high
+
+  - scope: system:read
+    description_method: derived
+    description: Read CMS system configuration and site settings.
+  - scope: system:write
+    description_method: derived
+    description: Modify CMS system configuration and site settings.
+    risk: high
+
+  - scope: blueprints:read
+    description_method: derived
+    description: Read Statamic blueprints and fieldsets (the content schema).
+  - scope: blueprints:write
+    description_method: derived
+    description: Modify Statamic blueprints and fieldsets.
+
+  - scope: terms:read
+    description_method: derived
+    description: Read taxonomy terms.
+  - scope: terms:write
+    description_method: derived
+    description: Create, update and delete taxonomy terms.
+
+  - scope: globals:read
+    description_method: derived
+    description: Read global content sets shared across the site.
+  - scope: globals:write
+    description_method: derived
+    description: Modify global content sets.
+
+  - scope: content-facade:read
+    description_method: derived
+    description: Read content through the Statamic content facade abstraction.
+  - scope: content-facade:write
+    description_method: derived
+    description: Write content through the Statamic content facade abstraction.
+
+findings:
+  - >-
+    A wildcard '*' scope is offered alongside the granular pairs. An agent that
+    requests '*' receives write access to users and system configuration; there is
+    no published guidance steering integrators toward least privilege.
+  - >-
+    Every family is offered as a read/write pair with no finer granularity, so
+    there is no way to grant, for example, publish-without-delete.
+  - >-
+    These scopes govern the marketing website's CMS only. No OAuth scope surface
+    exists for the involve.me funnel product's own data (funnels, submissions,
+    participants, contacts).

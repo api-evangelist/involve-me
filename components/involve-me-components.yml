@@ -1,0 +1,125 @@
+generated: '2026-08-12'
+method: searched
+source: >-
+  https://help.involve.me/en/articles/1567355-share-embed-your-funnel (200),
+  https://www.involve.me/features/embeds-popups (200),
+  https://help.involve.me/en/articles/3545275-how-to-embed-fullscreen,
+  https://help.involve.me/en/articles/10031999-video-tutorial-how-to-share-your-funnel-as-a-pop-up,
+  https://help.involve.me/en/articles/10539642-involve-me-webflow-plugin,
+  https://help.involve.me/en/articles/1946018-how-to-embed-your-involve-me-funnel-on-other-platforms-wix-shopify-squarespace-weebly-etc
+description: >-
+  involve.me's client-side surface — and it is the company's real developer
+  surface, more so than anything at api.involve.me. Every funnel a customer builds
+  ships with a copy-paste embed that loads a first-party script into the customer's
+  own page. This is distinct from an SDK: there is no programmatic client, only a
+  declarative loader driven by data- attributes.
+
+loader:
+  name: involve.me embed loader
+  url_pattern: https://<organization>.involve.me/embed
+  host: the customer's own involve.me organisation subdomain (or a custom domain)
+  versioned: false
+  pinned: false
+  integrity_attribute: false
+  version_note: >-
+    The loader URL contains no version segment, hash or query parameter and no
+    subresource-integrity attribute is offered. Customers embed a floating,
+    unpinnable, unverifiable third-party script into their own pages. See
+    packages/involve-me-packages.yml.
+
+markup:
+  minimal: '<div class="involveme_embed" data-project="funnelname"><script src="https://example.involve.me/embed"></script></div>'
+  with_parameters: '<div class="involveme_embed" data-project="funnelname" data-params="field1=value1,field2=value2"></div>'
+  attributes:
+    - name: class
+      value: involveme_embed
+      required: true
+      note: The hook the loader queries for.
+    - name: data-project
+      required: true
+      note: The funnel slug to render.
+    - name: data-params
+      required: false
+      note: >-
+        Comma-separated key=value pairs prefilled into the funnel's hidden fields —
+        the mechanism for passing caller context (user id, campaign, plan) into a
+        submission and back out through the webhook's remote_id / hidden fields.
+  iframe_guidance: >-
+    involve.me explicitly advises against supplying your own <iframe>: "We advise
+    not to use your own <iframe> tags since it will not guarantee full
+    functionality for your funnels." The loader owns dynamic height, transparency
+    and resize messaging.
+
+families:
+
+  - family: Embeds
+    components:
+      - name: Standard (inline) embed
+        description: Responsive in-page widget rendered where the div sits.
+        options:
+          - minimum height
+          - fixed width
+          - dynamic height resizing
+          - transparent / coloured / image background
+          - custom loading colour
+      - name: Full-screen embed
+        description: Funnel takes the full browser viewport.
+        docs: https://help.involve.me/en/articles/3545275-how-to-embed-fullscreen
+      - name: Pop-up embed
+        description: Funnel presented in a modal.
+        docs: https://help.involve.me/en/articles/10031999-video-tutorial-how-to-share-your-funnel-as-a-pop-up
+        triggers_documented: [exit intent, page load, click, time delay]
+        triggers_source: https://www.involve.me/pop-up-maker
+
+  - family: Hosted surfaces
+    note: Not embedded — involve.me hosts and serves the page itself.
+    components:
+      - name: Hosted funnel page
+        description: The funnel served at <organization>.involve.me/<funnel>.
+      - name: Custom domain
+        description: >-
+          The hosted funnel served from the customer's own domain via CNAME with
+          managed SSL/HTTPS.
+        docs: https://help.involve.me/en/articles/2359485-custom-domains
+        plan: Grow and above (1 custom domain included on Grow)
+      - name: Short URL
+        description: Condensed shareable funnel link.
+      - name: QR code
+        description: Generated for the funnel URL.
+
+  - family: Platform plugins
+    note: >-
+      Wrappers around the same loader for CMS/website builders. None is distributed
+      through a package registry.
+    components:
+      - name: Webflow plugin
+        docs: https://help.involve.me/en/articles/10539642-involve-me-webflow-plugin
+      - name: WordPress embed
+        docs: https://help.involve.me/en/articles/10257416-video-tutorial-how-to-embed-your-funnel-on-wordpress
+      - name: Wix / Shopify / Squarespace / Weebly embeds
+        docs: https://help.involve.me/en/articles/1946018-how-to-embed-your-involve-me-funnel-on-other-platforms-wix-shopify-squarespace-weebly-etc
+
+  - family: In-funnel injection
+    note: Code the customer injects INTO an involve.me funnel, the reverse direction.
+    components:
+      - name: Custom script via Google Tag Manager
+        docs: https://help.involve.me/en/articles/10729209-install-a-custom-script-via-google-tag-manager
+      - name: Custom <head> meta tags
+        docs: https://help.involve.me/en/articles/5046143-how-to-add-custom-meta-tags-in-the-head-section
+      - name: Support chat widget (Gist / Intercom)
+        docs: https://help.involve.me/en/articles/2007307-integrate-a-support-chat-widget-in-your-funnels
+
+javascript_api:
+  documented: false
+  note: >-
+    No window-level object, no event callbacks, no programmatic open/close/submit
+    hooks and no postMessage contract are documented. The embed is configured
+    entirely through markup attributes, so a host page cannot react to funnel
+    events client-side — it must wait for the server-side webhook.
+
+component_count: 12
+
+gaps:
+  - Loader is unversioned and unpinnable, with no SRI hash offered.
+  - No documented JS API or event callbacks for the host page.
+  - No npm distribution, so the loader cannot be bundled or self-hosted.

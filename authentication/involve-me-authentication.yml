@@ -1,0 +1,135 @@
+generated: '2026-08-12'
+method: searched
+source: >-
+  https://www.involve.me/.well-known/oauth-authorization-server (200),
+  https://www.involve.me/.well-known/oauth-protected-resource (200),
+  https://help.involve.me/en/articles/2193514-receive-submission-data-with-webhooks-anywhere,
+  https://www.involve.me/pricing. Derived from no OpenAPI — involve.me publishes none.
+description: >-
+  How a machine authenticates to involve.me. There is no public REST API and
+  therefore no API-key programme for one; the authenticated surfaces are the
+  OAuth-protected MCP server, the outbound webhook (where involve.me is the client
+  and the integrator supplies the credential), and the human-facing app with SSO
+  on Enterprise. Each scheme below was observed or read on a provider page — none
+  is inferred from a spec.
+
+api_reference: null
+api_reference_note: >-
+  No OpenAPI, Swagger, GraphQL SDL or Postman collection is published on any
+  involve.me host. developers.involve.me and docs.involve.me both return 302 to
+  the marketing homepage.
+
+schemes:
+
+  - id: mcp_oauth2
+    type: oauth2
+    surface: https://www-cdn.involve.me/mcp/statamic
+    applies_to: The Statamic CMS MCP server (marketing website content).
+    method: probed
+    flows:
+      authorization_code:
+        authorization_url: https://www-cdn.involve.me/cp/mcp/oauth/authorize
+        token_url: https://www-cdn.involve.me/mcp/oauth/token
+        refresh_supported: true
+        pkce: S256
+        pkce_required: true
+    dynamic_client_registration:
+      supported: true
+      registration_endpoint: https://www-cdn.involve.me/mcp/oauth/register
+      client_id_metadata_document_supported: true
+    revocation_endpoint: https://www-cdn.involve.me/mcp/oauth/revoke
+    token_endpoint_auth_methods: [none]
+    bearer_methods_supported: [header]
+    scopes: scopes/involve-me-scopes.yml
+    evidence:
+      url: https://www.involve.me/.well-known/oauth-authorization-server
+      http_status: 200
+
+  - id: mcp_static_token
+    type: http
+    scheme: bearer
+    alternate: basic
+    surface: https://www-cdn.involve.me/mcp/statamic
+    applies_to: The same MCP server, as an alternative to the OAuth flow.
+    method: probed
+    detail: >-
+      The unauthenticated 401 body states "Provide a Bearer token or Basic Auth
+      credentials" and hints "Create an API token in the Statamic MCP dashboard" —
+      i.e. a tenant-issued static token created inside the CMS control panel. No
+      public documentation of that token's format, rotation or expiry exists.
+    evidence:
+      url: https://www-cdn.involve.me/mcp/statamic
+      http_status: 401
+      www_authenticate: Bearer realm="mcp"
+
+  - id: webhook_custom_header
+    type: apiKey
+    in: header
+    surface: outbound webhook delivery
+    direction: outbound
+    applies_to: >-
+      involve.me POSTing submission data to the integrator's endpoint. involve.me
+      is the CLIENT here; the integrator defines the credential.
+    method: searched
+    detail: >-
+      The webhook configuration accepts one custom "Header Name" / "Header Value"
+      pair, which involve.me sends on every delivery. This is the only
+      authentication available on the webhook surface.
+    name: user-defined
+    signature_verification: false
+    signature_note: >-
+      No HMAC signature, no signing secret and no timestamp header is documented.
+      A receiver cannot cryptographically verify that a payload came from
+      involve.me — a shared static header is the whole of the trust model.
+    evidence:
+      url: https://help.involve.me/en/articles/2193514-receive-submission-data-with-webhooks-anywhere
+      http_status: 200
+
+  - id: app_sso
+    type: openIdConnect
+    surface: https://app.involve.me/login
+    applies_to: Human sign-in to the involve.me application.
+    method: searched
+    detail: >-
+      Single sign-on is listed as an Enterprise-plan feature on the pricing page.
+      The identity providers, protocol (SAML vs OIDC) and configuration are not
+      publicly documented; involve.me publishes no /.well-known/openid-configuration
+      (probed 404 on www. and app.).
+    evidence:
+      url: https://www.involve.me/pricing
+      http_status: 200
+
+  - id: app_session
+    type: http
+    scheme: cookie
+    surface: https://app.involve.me
+    applies_to: The product SPA's own backend.
+    method: probed
+    detail: >-
+      app.involve.me/api/v1/* returns 302 to login for anonymous callers and the
+      edge sets XSRF-TOKEN and lvapp_session cookies (Laravel). This is an internal,
+      session-authenticated surface, not a published API — it is recorded for
+      accuracy, not as an integration path.
+    evidence:
+      url: https://app.involve.me/api/v1/projects
+      http_status: 302
+
+summary:
+  public_api_key_programme: false
+  oauth2: true
+  openid_connect_discovery: false
+  mtls: false
+  webhook_signature_verification: false
+  scheme_count: 5
+
+gaps:
+  - >-
+    No published authentication documentation for developers of any kind — the
+    OAuth metadata is discoverable only by probing /.well-known/.
+  - >-
+    Webhook deliveries carry no signature. Adding an HMAC signature header with a
+    per-endpoint secret is the single highest-value authentication fix available
+    to involve.me.
+  - >-
+    Token lifetime, refresh-token rotation and expiry are not stated anywhere for
+    the MCP credential.

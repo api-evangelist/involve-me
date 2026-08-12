@@ -1,0 +1,163 @@
+generated: '2026-08-12'
+method: searched
+source: >-
+  https://help.involve.me/en/articles/2193514-receive-submission-data-with-webhooks-anywhere
+  (HTTP 200) — involve.me's own webhook reference. Plan gating corroborated at
+  https://www.involve.me/pricing (HTTP 200).
+description: >-
+  involve.me's event surface. It is outbound-only: involve.me POSTs a JSON document
+  to a URL the customer configures when a participant completes a funnel. There is
+  exactly one event type. No AsyncAPI document is published, and no event catalog,
+  schema file or subscription API exists — this artifact is the structured capture
+  of the human documentation, not a spec harvested from the provider.
+
+asyncapi_published: false
+asyncapi_probe:
+  - url: https://www.involve.me/asyncapi.yaml
+    status: 404
+  - url: https://api.involve.me/asyncapi.json
+    status: 404
+
+surface:
+  style: outbound webhook (HTTP callback)
+  direction: provider -> subscriber
+  protocol: HTTPS
+  method: POST
+  content_type: application/json
+  user_agent: involve.me
+  source_region: AWS eu-central-1 IP ranges
+  tls_required: true
+  tls_note: >-
+    HTTPS is required for live connections; plain HTTP is documented as acceptable
+    for testing only.
+  configuration: >-
+    Per-funnel, in the funnel's integration settings. There is no API to register,
+    list, update or delete a webhook endpoint — configuration is UI-only.
+  plan_gating: Scale plan and above. Not available on Free, Start or Grow.
+
+security:
+  signature: false
+  signing_secret: false
+  timestamp_header: false
+  replay_protection: false
+  custom_header:
+    supported: true
+    count: 1
+    detail: >-
+      A single user-defined "Header Name" / "Header Value" pair is sent on every
+      delivery. This is the only authentication mechanism offered.
+  assessment: >-
+    A static shared header is bearer-equivalent: anyone who learns the value can
+    forge deliveries, and the receiver has no way to prove a payload originated
+    from involve.me. An HMAC signature over the raw body plus a timestamp is the
+    standard remedy and is absent.
+
+delivery:
+  retries: undocumented
+  retry_backoff: undocumented
+  timeout: undocumented
+  ordering: undocumented
+  at_least_once: undocumented
+  dead_letter: undocumented
+  delivery_log: undocumented
+  note: >-
+    involve.me publishes no delivery-semantics statement at all. A subscriber
+    cannot tell whether a failed delivery is retried, how many times, or whether
+    duplicates are possible — so every receiver must be written defensively and
+    treat participant_id as the idempotency key by assumption, not by contract.
+
+event_count: 1
+
+events:
+  - name: finished_participant
+    description: >-
+      Emitted when a participant reaches the final page of a funnel (a thank-you
+      page or an outcome page). This is the only event type involve.me documents.
+    trigger: participant completes the funnel
+    envelope:
+      event:
+        type: finished_participant
+        version: 1
+        created_at: UTC timestamp
+    payload_fields:
+      - participant_id
+      - project_name
+      - project_url
+      - correctly_answered
+      - score
+      - calculator_result
+      - calculator_results
+      - has_outcomes
+      - outcome
+      - outcome_points
+      - country_code
+      - anonymized_ip
+      - seconds_to_complete
+      - embed_url
+      - device_type
+      - remote_id
+      - opened_at
+      - finished_at
+      - personal_data
+      - questions
+    nested_objects:
+      question:
+        fields: [id, type, question_text, answered_correctly, max_value, checked, answers_given]
+      answer:
+        note: field set varies by question type
+        fields:
+          - response_text
+          - response_image
+          - response_icon
+          - connected_outcome
+          - correct
+          - value
+          - rating_percent
+          - rating_input
+          - rating_max
+          - slider_input
+          - slider_min
+          - slider_max
+          - file_url
+          - file_name
+          - file_bytes
+          - file_type
+      personal_data:
+        note: >-
+          Object of the identity fields the funnel collected (name, email, phone
+          and any custom contact fields). Field names follow the funnel's own
+          field configuration, so the shape is tenant-specific and not fixed.
+
+not_covered:
+  - >-
+    Partial submissions (participants who abandon mid-funnel) are a documented
+    product feature but are not a webhook event — they are retrieved in the app.
+  - >-
+    Payment events (involve.me integrates Stripe and PayPal for payment pages) do
+    not emit involve.me webhooks; the payment provider's own webhooks apply.
+  - >-
+    Email-automation events (sent, opened, clicked) drive internal sequence
+    branching but are not exposed as outbound events.
+  - Funnel lifecycle (published, unpublished, deleted) emits nothing.
+
+alternatives:
+  - name: Zapier
+    url: https://help.involve.me/en/articles/2237456-zapier-integration
+    note: The most commonly used programmatic path off the platform.
+  - name: Make
+    url: https://apps.make.com/involve-me
+    note: Third-party connector; not documented on involve.me's own site.
+  - name: native integrations
+    url: https://www.involve.me/integrations
+    count_claimed: 55+
+    note: >-
+      Push-only connectors to CRM/ESP destinations, configured in the UI. They are
+      integrations, not an API — none of them is addressable by a caller.
+
+recommendations_to_provider:
+  - Sign webhook deliveries (HMAC-SHA256 over the raw body + timestamp header).
+  - Publish delivery semantics — retry count, backoff, timeout, duplicate policy.
+  - Publish an AsyncAPI 3.x document for the finished_participant event.
+  - >-
+    Add events for partial submissions and funnel lifecycle; a single terminal
+    event forces integrators to poll the UI for everything else.

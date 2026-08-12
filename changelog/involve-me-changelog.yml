@@ -1,0 +1,62 @@
+generated: '2026-08-12'
+method: searched
+source: >-
+  404 probes of https://www.involve.me/changelog, /release-notes,
+  /product-updates, /whats-new and /updates; 302 on https://roadmap.involve.me/;
+  404 on https://feedback.involve.me/. Nearest first-party equivalent found at
+  https://www.involve.me/blog?category=product (200), cross-checked against the
+  731-URL blog sitemap at https://www.involve.me/sitemap-blog.xml (200).
+description: >-
+  involve.me publishes no changelog. Product news appears as marketing blog posts
+  in a "product" category — announcement copy, not a change record. This file
+  records that absence with the probes behind it rather than dressing the blog up
+  as a changelog.
+
+changelog_published: false
+scheme: none
+current_version: null
+versioning_policy: null
+
+probes:
+  - url: https://www.involve.me/changelog
+    status: 404
+  - url: https://www.involve.me/release-notes
+    status: 404
+  - url: https://www.involve.me/product-updates
+    status: 404
+  - url: https://www.involve.me/whats-new
+    status: 404
+  - url: https://www.involve.me/updates
+    status: 404
+  - url: https://roadmap.involve.me/
+    status: 302
+    redirects_to: https://www.involve.me/
+  - url: https://feedback.involve.me/
+    status: 404
+
+nearest_equivalent:
+  url: https://www.involve.me/blog?category=product
+  type: blog category
+  cadence: irregular
+  entries: []
+  entries_note: >-
+    Deliberately empty. The product-category posts are marketing announcements
+    (for example https://www.involve.me/blog/product-updates-in-june-23 and
+    https://www.involve.me/blog/soc2-compliance) with no version number, no date-
+    ordered completeness, and no breaking-versus-additive classification. Copying
+    them into a structured entries[] would misrepresent announcement copy as a
+    change record, so nothing was transcribed.
+
+api_change_history:
+  applicable: false
+  note: >-
+    There is no public API contract to change, so there is nothing an integrator
+    would need a changelog to track. The one change that DID break integrators —
+    the retirement of developers.involve.me and docs.involve.me, which third-party
+    integration guides still cite — was never announced anywhere. See
+    lifecycle/involve-me-lifecycle.yml#deprecation.
+
+recommendation_to_provider: >-
+  Publish a dated changelog separate from the marketing blog, and classify each
+  entry as breaking or additive — starting with the webhook payload, whose
+  event.version field implies a versioning contract that no policy backs.

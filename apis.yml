@@ -1,29 +1,209 @@
 aid: involve-me
 name: involve.me
-description: involve.me is an AI quiz, form and funnel builder with email automation, used by marketing
-  teams to capture and qualify leads. Surfaced via the programmable-marketing integration graph.
+description: >-
+  involve.me is an AI quiz, form and funnel builder with built-in email automation
+  and a lightweight CRM, operated by stereosense GmbH and used by marketing teams to
+  capture, qualify and follow up on leads. Customers build quizzes, assessments,
+  calculators, product finders, landing pages, surveys and payment pages in a no-code
+  editor, publish them as a hosted page or an embedded widget, and route submissions
+  into 55+ native CRM and email destinations. Its programmable surface is deliberately
+  narrow: there is no public REST API and no OpenAPI, and the only machine-addressable
+  paths are an outbound webhook that fires when a participant completes a funnel
+  (Scale plan and above), a copy-paste JavaScript embed loader, Zapier and Make
+  connectors, and an OAuth-protected Model Context Protocol server that exposes the
+  marketing website's Statamic CMS rather than the product itself.
 url: https://raw.githubusercontent.com/api-evangelist/involve-me/refs/heads/main/apis.yml
+image: https://www.involve.me/favicons/favicon-32x32.png
 x-type: company
 x-source: harvest:marketing-integration-graph
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: >-
+  Upgraded from stub by the local enrichment pass on 2026-08-12. Real provider
+  artifacts were harvested verbatim (llms.txt, RFC 9116 security.txt, RFC 8414 and
+  RFC 9728 OAuth metadata) and a live gated MCP server was probed, but no OpenAPI or
+  public REST API exists.
 specificationVersion: '0.20'
 created: '2026-08-12'
 modified: '2026-08-12'
 tags:
 - Company
-apis: []
+- Marketing
+- Lead Generation
+- Forms
+- Surveys
+- Quizzes
+- No-Code
+- Email Marketing
+- CRM
+- Webhooks
+- Model Context Protocol
+- Austria
+apis:
+- name: involve.me Website Content MCP Server
+  description: >-
+    A live, OAuth-protected Model Context Protocol server that involve.me serves from
+    its own infrastructure and advertises through RFC 9728 protected-resource metadata
+    on www.involve.me. SCOPE: it exposes the Statamic CMS behind the involve.me
+    MARKETING WEBSITE — entries, collections, taxonomy terms, assets, globals and
+    blueprints — not the involve.me funnel product. There is no MCP, REST or GraphQL
+    interface to funnels, submissions, participants, contacts or email sequences. The
+    tool list is auth-gated (JSON-RPC tools/list returns 401 with a spec-correct
+    WWW-Authenticate Bearer challenge), so no tool schemas have been recorded.
+  humanURL: https://www.involve.me/
+  baseURL: https://www-cdn.involve.me/mcp/statamic
+  tags:
+  - Model Context Protocol
+  - Content Management
+  - OAuth
+  properties:
+  - type: MCPServer
+    url: mcp/involve-me-mcp.yml
+  - type: Authentication
+    url: authentication/involve-me-authentication.yml
+  - type: OAuthScopes
+    url: scopes/involve-me-scopes.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: TrustCenter
+  url: security/involve-me-trust-center.yml
+- type: VulnerabilityDisclosure
+  url: security/involve-me-vulnerability-disclosure.yml
+- type: Security
+  url: security/involve-me-vulnerability-disclosure.yml
+- type: DomainSecurity
+  url: security/involve-me-domain-security.yml
 - type: Website
   url: https://www.involve.me/
+- type: Documentation
+  url: https://help.involve.me/en/
+- type: Support
+  url: https://www.involve.me/contact
+- type: Blog
+  url: https://www.involve.me/blog
+- type: Pricing
+  url: https://www.involve.me/pricing
+- type: SignUp
+  url: https://app.involve.me/register
+- type: Login
+  url: https://app.involve.me/login
+- type: TermsOfService
+  url: https://www.involve.me/terms
+- type: PrivacyPolicy
+  url: https://www.involve.me/privacy
+- type: GitHubOrganization
+  url: https://github.com/stereosense
+- type: StatusPage
+  url: https://status.involve.me/
+- type: Integrations
+  url: https://www.involve.me/integrations
+- type: DataProcessingAgreement
+  url: https://www.involve.me/data-processing
+- type: LLMsTxt
+  url: llms/involve-me-llms.txt
+- type: WellKnown
+  url: well-known/involve-me-well-known.yml
+- type: SecurityTxt
+  url: well-known/involve-me-security.txt
+- type: Webhooks
+  url: asyncapi/involve-me-webhooks.yml
+- type: Authentication
+  url: authentication/involve-me-authentication.yml
+- type: OAuthScopes
+  url: scopes/involve-me-scopes.yml
+- type: MCPServer
+  url: mcp/involve-me-mcp.yml
+- type: Conformance
+  url: conformance/involve-me-conformance.yml
+- type: Compliance
+  url: conformance/involve-me-conformance.yml
+- type: Lifecycle
+  url: lifecycle/involve-me-lifecycle.yml
+- type: Plans
+  url: plans/involve-me-plans-pricing.yml
+- type: Conventions
+  url: conventions/involve-me-conventions.yml
+- type: Components
+  url: components/involve-me-components.yml
+- type: DataModel
+  url: data-model/involve-me-data-model.yml
+x-pointers-deliberately-omitted:
+  note: >-
+    These artifacts exist in the repo and record an honest ABSENCE. No common[]
+    pointer is emitted for them, because the pointer asserts the provider publishes
+    that surface — the same rule this pipeline applies to a well-known probe where
+    every path 404s. Emitting them would credit involve.me for documents it does not
+    serve.
+  omitted:
+  - type: ChangeLog
+    artifact: changelog/involve-me-changelog.yml
+    reason: >-
+      No changelog exists. /changelog, /release-notes, /product-updates, /whats-new
+      and /updates all return 404; the nearest equivalent is a marketing blog category.
+  - type: RateLimits
+    artifact: rate-limits/involve-me-rate-limits.yml
+    reason: limit_count is 0 — no rate limits are published, because no API is published.
+  - type: Packages
+    artifact: packages/involve-me-packages.yml
+    reason: >-
+      package_count is 0 — no first-party client library exists on npm, PyPI,
+      Packagist or any other registry, and neither GitHub org publishes one.
+  - type: SDKs
+    artifact: packages/involve-me-packages.yml
+    reason: official_sdk_count is 0.
+  - type: Deprecation
+    artifact: lifecycle/involve-me-lifecycle.yml
+    reason: >-
+      No deprecation or sunset policy is published; the Lifecycle artifact records
+      that absence alongside the StatusPage hit.
+  - type: Idempotency
+    artifact: conventions/involve-me-conventions.yml
+    reason: >-
+      No idempotency mechanism exists on either surface, and involve.me publishes no
+      delivery-identifier guarantee a receiver could deduplicate on.
+  - type: AgentCard
+    artifact: null
+    reason: >-
+      /.well-known/agent-card.json and /.well-known/agent.json return 404 on
+      www., app. and api.involve.me. Nothing was written to a2a/ — an agent card is
+      never authored on a provider's behalf.
 x-vouched-by:
 - Drip
 - MailerLite
 x-vouch-count: 2
 x-not-duplicate-of: involveai -- involve.ai is an AI customer-intelligence platform for customer success
   teams; involve.me is a marketing funnel builder. Different companies, verified 2026-08-12.
+x-enrichment:
+  date: '2026-08-12'
+  status: enriched
+  artifacts_added: 21
+  pass: local-v1
+x-coverage:
+  state: covered
+  reason: partial-surface
+  detail: >-
+    Four provider-published documents were harvested verbatim (llms.txt, an RFC 9116
+    security.txt, and RFC 8414 + RFC 9728 OAuth metadata) and a live OAuth-gated MCP
+    server was probed, but involve.me publishes no OpenAPI and no public REST API:
+    developers.involve.me and docs.involve.me both 302 into involve.me's own
+    funnel-hosting edge with utm_campaign=customer_organization-deleted, and
+    api.involve.me answers 404 at every probed path.
+  evidence:
+  - url: https://www.involve.me/.well-known/oauth-protected-resource
+    status: 200
+  - url: https://www.involve.me/llms.txt
+    status: 200
+  - url: https://app.involve.me/.well-known/security.txt
+    status: 200
+  - url: https://www-cdn.involve.me/mcp/statamic
+    status: 401
+  - url: https://developers.involve.me/
+    status: 302
+  - url: https://docs.involve.me/
+    status: 302
+  - url: https://api.involve.me/openapi.json
+    status: 404
+  checked: '2026-08-12'

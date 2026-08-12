@@ -1,0 +1,163 @@
+generated: '2026-08-12'
+method: searched
+source: >-
+  https://help.involve.me/en/articles/2193514-receive-submission-data-with-webhooks-anywhere,
+  https://help.involve.me/en/articles/1567355-share-embed-your-funnel,
+  https://www.involve.me/.well-known/oauth-authorization-server,
+  https://www.involve.me/.well-known/oauth-protected-resource, and live HTTP
+  observation of api.involve.me / app.involve.me / www-cdn.involve.me.
+description: >-
+  The cross-cutting runtime semantics of involve.me's programmable surfaces. There
+  are only two — an outbound webhook and a gated MCP server — so most of the
+  conventions this artifact normally profiles (pagination, expansion, sparse
+  fields, request-id tracing, error envelopes) have no surface to describe. What is
+  recorded here is what actually governs a machine integrating with involve.me,
+  including the parts that are governed by nothing.
+
+base_urls:
+  product_api: null
+  mcp: https://www-cdn.involve.me/mcp/statamic
+  app: https://app.involve.me
+  embed_loader: https://<organization>.involve.me/embed
+  note: >-
+    api.involve.me exists and terminates on involve.me's Caddy/Laravel edge
+    (x-involve-me-app: True) but returns 404 at every probed path. It is not a
+    published API host.
+
+api_style: >-
+  No request/response API. involve.me is integrated by (a) receiving a JSON POST it
+  sends you, (b) an OAuth-protected JSON-RPC MCP server over the marketing CMS, or
+  (c) a UI-configured connector to a third-party destination.
+
+authentication:
+  style: >-
+    Surface-dependent. OAuth 2.0 authorization_code + PKCE (or a tenant-issued
+    static token) for MCP; a single user-defined static header for webhook
+    deliveries; session cookies for the app. No API-key programme exists.
+  detail: authentication/involve-me-authentication.yml
+  scopes: scopes/involve-me-scopes.yml
+
+idempotency:
+  supported: false
+  mechanism: null
+  header: null
+  retention: null
+  note: >-
+    No idempotency support of any kind, and none is applicable in the usual
+    direction — there is no write API for a client to retry. In the outbound
+    direction involve.me is the one making requests, and it publishes no retry
+    policy and no delivery-identifier contract, so a receiver has no
+    provider-guaranteed key to deduplicate on. participant_id is the field a
+    receiver would in practice key on, but involve.me nowhere states that it is
+    stable or unique per delivery, so treating it as an idempotency key is the
+    integrator's inference, not the provider's guarantee.
+  agent_impact: >-
+    An agent cannot safely replay anything against involve.me and cannot be told by
+    the provider whether a webhook it already processed may arrive again.
+
+pagination:
+  style: not-applicable
+  note: No list endpoints are published.
+
+field_expansion:
+  supported: not-applicable
+sparse_fieldsets:
+  supported: not-applicable
+
+metadata:
+  supported: true
+  mechanism: hidden fields and URL parameters
+  detail: >-
+    Arbitrary caller-supplied values can be threaded through a funnel via Hidden
+    Fields (https://www.involve.me/features/hidden-fields) and via the embed's
+    data-params attribute; a remote_id field is carried through to the webhook
+    payload, which is the closest thing involve.me offers to a correlation key
+    between the integrator's system and a submission.
+  fields: [remote_id, hidden fields (funnel-defined)]
+
+request_tracing:
+  request_id_header: false
+  observed: >-
+    The edge returns a `request-id` response header (a UUID) on api./app./
+    developers. responses. It is an internal Laravel/Sentry correlation value — it
+    is not documented, not stable across the request lifecycle from a caller's
+    point of view, and there is no published support workflow that accepts it.
+  agent_impact: No documented way to reference a specific request when reporting a problem.
+
+versioning:
+  api_version: not-applicable
+  webhook_envelope_version: 1
+  location: event.version in the webhook payload
+  policy: none published
+  detail: lifecycle/involve-me-lifecycle.yml
+
+error_envelope:
+  format: none published
+  rfc9457: false
+  observed:
+    - surface: MCP
+      status: 401
+      body: >-
+        {"error":"Authentication required","message":"Provide a Bearer token or
+        Basic Auth credentials","hint":"Create an API token in the Statamic MCP
+        dashboard"}
+      shape: ad-hoc JSON {error, message, hint}
+      content_type: application/json
+    - surface: api.involve.me
+      status: 404
+      shape: HTML "Page Not Found" page, not a machine-readable error
+      content_type: text/html
+  note: >-
+    The only structured error involve.me emits anywhere is the MCP 401. It is
+    ad-hoc, not application/problem+json, and carries no error code an integrator
+    could switch on. A 404 on the API host returns an HTML page — a caller expecting
+    JSON gets markup.
+  detail: errors/ — not written; there is no error reference to derive one from.
+
+rate_limit_signaling:
+  headers: []
+  status_on_exhaustion: null
+  detail: rate-limits/involve-me-rate-limits.yml
+
+content_negotiation:
+  request_content_types: [application/json]
+  response_content_types: [application/json, text/html]
+  note: >-
+    Webhook deliveries are application/json. The MCP endpoint accepts
+    application/json and advertises text/event-stream support per Streamable HTTP.
+
+cors:
+  observed_header: 'access-control-allow-origin: https://app.involve.me'
+  note: >-
+    The edge pins CORS to app.involve.me across api., app. and the parked developer
+    subdomains — consistent with a first-party SPA backend rather than a
+    third-party-callable API. This is corroborating evidence that api.involve.me is
+    an internal host.
+
+webhook_conventions:
+  method: POST
+  content_type: application/json
+  user_agent: involve.me
+  source_ips: AWS eu-central-1 ranges
+  tls: required for live endpoints
+  signature: none
+  retries: undocumented
+  detail: asyncapi/involve-me-webhooks.yml
+
+embed_conventions:
+  markup: '<div class="involveme_embed" data-project="FUNNEL"><script src="https://ORG.involve.me/embed"></script></div>'
+  parameter_passing: 'data-params="field1=value1,field2=value2"'
+  iframe_guidance: >-
+    involve.me explicitly advises against hand-rolling an <iframe>, since the
+    loader handles dynamic height, transparency and resize messaging.
+  versioning: none — the loader URL is unpinned
+  detail: components/involve-me-components.yml
+
+summary_for_agents:
+  callable_api: false
+  idempotency: false
+  error_codes: false
+  rate_limit_signal: false
+  correlation_id: partial (remote_id, integrator-supplied)
+  event_surface: 1 outbound event
+  agent_surface: 1 gated MCP server, scoped to the marketing CMS
