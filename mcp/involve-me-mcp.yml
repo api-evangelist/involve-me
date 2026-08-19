@@ -1,19 +1,14 @@
 generated: '2026-08-12'
 method: probed
-source: >-
-  https://www.involve.me/.well-known/oauth-protected-resource (200) and
-  https://www.involve.me/.well-known/oauth-authorization-server (200), then a
-  direct JSON-RPC tools/list POST to https://www-cdn.involve.me/mcp/statamic
-  (401, WWW-Authenticate: Bearer realm="mcp").
-description: >-
-  involve.me serves a live, OAuth-protected Model Context Protocol server. It is
-  advertised by RFC 9728 protected-resource metadata on the public marketing host
-  and it answers. IMPORTANT SCOPE NOTE — this server exposes the CONTENT of the
-  involve.me marketing website (a Statamic CMS: entries, collections, taxonomies,
-  assets, globals, blueprints). It is NOT an MCP interface to the involve.me
-  funnel product; there is no MCP surface for funnels, submissions, contacts or
-  email sequences. Read the tools[] below with that boundary in mind.
-
+source: 'https://www.involve.me/.well-known/oauth-protected-resource (200) and https://www.involve.me/.well-known/oauth-authorization-server
+  (200), then a direct JSON-RPC tools/list POST to https://www-cdn.involve.me/mcp/statamic (401, WWW-Authenticate:
+  Bearer realm="mcp").'
+description: 'involve.me serves a live, OAuth-protected Model Context Protocol server. It is advertised
+  by RFC 9728 protected-resource metadata on the public marketing host and it answers. IMPORTANT SCOPE
+  NOTE — this server exposes the CONTENT of the involve.me marketing website (a Statamic CMS: entries,
+  collections, taxonomies, assets, globals, blueprints). It is NOT an MCP interface to the involve.me
+  funnel product; there is no MCP surface for funnels, submissions, contacts or email sequences. Read
+  the tools[] below with that boundary in mind.'
 server:
   name: involve.me Statamic Content MCP
   url: https://www-cdn.involve.me/mcp/statamic
@@ -22,10 +17,8 @@ server:
   first_party: true
   status: live-gated
   advertised_by: https://www.involve.me/.well-known/oauth-protected-resource
-  covers: >-
-    The Statamic CMS behind www.involve.me — the marketing site, blog, template
-    library, integration pages and grounding pages. Not the funnel product.
-
+  covers: The Statamic CMS behind www.involve.me — the marketing site, blog, template library, integration
+    pages and grounding pages. Not the funnel product.
 x-evidence:
   fetched: '2026-08-12'
   probe:
@@ -34,70 +27,67 @@ x-evidence:
     body: '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
     accept: application/json, text/event-stream
     http_status: 401
-    www_authenticate: >-
-      Bearer realm="mcp",
-      resource_metadata="https://www-cdn.involve.me/.well-known/oauth-protected-resource/mcp/statamic"
-    body_returned: >-
-      {"error":"Authentication required","message":"Provide a Bearer token or
-      Basic Auth credentials","hint":"Create an API token in the Statamic MCP
-      dashboard"}
-  interpretation: >-
-    A spec-correct MCP OAuth challenge. The server is real and running; its tool
-    list and inputSchemas require an authenticated introspection we do not hold
-    credentials for. NO tool list has been fabricated below — the tools[] block is
-    absent by design, and the scope surface recorded instead is the one the
-    provider genuinely publishes anonymously.
-
+    www_authenticate: Bearer realm="mcp", resource_metadata="https://www-cdn.involve.me/.well-known/oauth-protected-resource/mcp/statamic"
+    body_returned: '{"error":"Authentication required","message":"Provide a Bearer token or Basic Auth
+      credentials","hint":"Create an API token in the Statamic MCP dashboard"}'
+  interpretation: A spec-correct MCP OAuth challenge. The server is real and running; its tool list and
+    inputSchemas require an authenticated introspection we do not hold credentials for. NO tool list has
+    been fabricated below — the tools[] block is absent by design, and the scope surface recorded instead
+    is the one the provider genuinely publishes anonymously.
 authentication:
   type: oauth2
-  flows: [authorization_code]
-  grant_types_supported: [authorization_code, refresh_token]
+  flows:
+  - authorization_code
+  grant_types_supported:
+  - authorization_code
+  - refresh_token
   pkce: S256
   dynamic_client_registration: true
   client_id_metadata_document_supported: true
-  token_endpoint_auth_methods_supported: [none]
+  token_endpoint_auth_methods_supported:
+  - none
   issuer: https://www-cdn.involve.me
   authorization_endpoint: https://www-cdn.involve.me/cp/mcp/oauth/authorize
   token_endpoint: https://www-cdn.involve.me/mcp/oauth/token
   registration_endpoint: https://www-cdn.involve.me/mcp/oauth/register
   revocation_endpoint: https://www-cdn.involve.me/mcp/oauth/revoke
-  bearer_methods_supported: [header]
-  alternative: >-
-    The 401 body also offers Basic Auth with an API token created in the Statamic
-    MCP dashboard, i.e. a tenant-issued static credential alongside the OAuth flow.
+  bearer_methods_supported:
+  - header
+  alternative: The 401 body also offers Basic Auth with an API token created in the Statamic MCP dashboard,
+    i.e. a tenant-issued static credential alongside the OAuth flow.
   scopes: scopes/involve-me-scopes.yml
-
 capability_surface_from_scopes:
-  note: >-
-    Derived from the 20 scopes the authorization server publishes, NOT from a tool
-    list. These name the resource families the server can act on; they are not tool
-    names and carry no inputSchema.
+  note: Derived from the 20 scopes the authorization server publishes, NOT from a tool list. These name
+    the resource families the server can act on; they are not tool names and carry no inputSchema.
   resource_families:
-    - content
-    - structures
-    - assets
-    - users
-    - system
-    - blueprints
-    - entries
-    - terms
-    - globals
-    - content-facade
-  access_levels: [read, write]
+  - content
+  - structures
+  - assets
+  - users
+  - system
+  - blueprints
+  - entries
+  - terms
+  - globals
+  - content-facade
+  access_levels:
+  - read
+  - write
   wildcard_scope_offered: true
-
 tool_crosswalk: null
-tool_crosswalk_reason: >-
-  A ToolCrosswalk binds MCP tools to backing OpenAPI operationIds. involve.me
-  publishes no OpenAPI and the live tool list is auth-gated, so both sides of the
-  mapping are absent. Nothing was written to avoid fabricating a binding.
-
+tool_crosswalk_reason: A ToolCrosswalk binds MCP tools to backing OpenAPI operationIds. involve.me publishes
+  no OpenAPI and the live tool list is auth-gated, so both sides of the mapping are absent. Nothing was
+  written to avoid fabricating a binding.
 gaps:
-  - The tool list and inputSchemas are not obtainable anonymously.
-  - >-
-    No MCP server exists for the involve.me product itself (funnels, submissions,
-    participants, contacts, email sequences) — only for the marketing website's CMS.
-  - >-
-    The protected-resource metadata is served from www.involve.me but names an
-    issuer and resource on www-cdn.involve.me, a host that is not documented
-    anywhere in involve.me's public help center.
+- The tool list and inputSchemas are not obtainable anonymously.
+- No MCP server exists for the involve.me product itself (funnels, submissions, participants, contacts,
+  email sequences) — only for the marketing website's CMS.
+- The protected-resource metadata is served from www.involve.me but names an issuer and resource on www-cdn.involve.me,
+  a host that is not documented anywhere in involve.me's public help center.
+deployment:
+  mode: remote
+  endpoint: https://www-cdn.involve.me/mcp/statamic
+  verified: probed
+  probe: gated
+  checked: '2026-08-12'
+  source: catalog MCP census
