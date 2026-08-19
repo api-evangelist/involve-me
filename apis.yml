@@ -22,7 +22,7 @@ x-tier-reason: >-
   artifacts were harvested verbatim (llms.txt, RFC 9116 security.txt, RFC 8414 and
   RFC 9728 OAuth metadata) and a live gated MCP server was probed, but no OpenAPI or
   public REST API exists.
-specificationVersion: '0.20'
+specificationVersion: '0.23'
 created: '2026-08-12'
 modified: '2026-08-12'
 tags:
