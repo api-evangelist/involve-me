@@ -35,6 +35,19 @@ tags:
 - No-Code
 - Email Marketing
 - CRM
+- Webhook
+- MCP
+- Austria
+tags_raw:
+- Company
+- Marketing
+- Lead Generation
+- Forms
+- Surveys
+- Quizzes
+- No-Code
+- Email Marketing
+- CRM
 - Webhooks
 - Model Context Protocol
 - Austria
@@ -52,6 +65,10 @@ apis:
   humanURL: https://www.involve.me/
   baseURL: https://www-cdn.involve.me/mcp/statamic
   tags:
+  - MCP
+  - Content Management
+  - Authentication
+  tags_raw:
   - Model Context Protocol
   - Content Management
   - OAuth
