@@ -1,0 +1,29 @@
+# Front Door AI Index — involve-me — 2026-09-17
+# AI vocabulary counted on the provider's root page. Generated; do not edit.
+# `score` is null unless ownership is `own` — see front_door_ai.py.
+front_door_ai:
+  slug: involve-me
+  lexicon_version: '1.0'
+  probed_at: '2026-09-17'
+  host: www.involve.me
+  final_host: www.involve.me
+  ownership: own
+  owner: involve-me
+  shares_host_with: null
+  inherited_from: null
+  verdict: scored
+  score: 35
+  host_score: 35
+  density: 15.61
+  words: 2242
+  tiers:
+    agentic: 9
+    core: 26
+    model: 0
+  ambiguous: 18
+  top_terms:
+    AI: 26
+    agent: 9
+    automation: 9
+    AI agent: 7
+    prompts: 2
