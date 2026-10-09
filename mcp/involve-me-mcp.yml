@@ -91,3 +91,38 @@ deployment:
   probe: gated
   checked: '2026-08-12'
   source: catalog MCP census
+rfc9728:
+  endpoint: https://www-cdn.involve.me/mcp/statamic
+  metadata_url: https://www-cdn.involve.me/.well-known/oauth-protected-resource/mcp/statamic
+  discovered_via: WWW-Authenticate resource_metadata on an anonymous POST initialize
+  fetched: '2026-09-25'
+  http_status: 200
+  content_type: application/json
+  document:
+    resource: https://www-cdn.involve.me/mcp/statamic
+    authorization_servers:
+    - https://www-cdn.involve.me
+    scopes_supported:
+    - '*'
+    - content:read
+    - content:write
+    - structures:read
+    - structures:write
+    - assets:read
+    - assets:write
+    - users:read
+    - users:write
+    - system:read
+    - system:write
+    - blueprints:read
+    - blueprints:write
+    - entries:read
+    - entries:write
+    - terms:read
+    - terms:write
+    - globals:read
+    - globals:write
+    - content-facade:read
+    - content-facade:write
+    bearer_methods_supported:
+    - header
