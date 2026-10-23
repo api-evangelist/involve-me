@@ -17,6 +17,7 @@ checked:
 - https://ecosystem.hubspot.com/marketplace/explore?eco_PRODUCT_TYPE=APP&eco_CERTIFIED=true
 - https://ecosystem.hubspot.com/marketplace/solutions
 - hubspot/integrations/hubspot-integration-edges.yml
+- airtable/integrations/airtable-integration-edges.yml
 summary: null
 marketplace_apps: []
 edges:
@@ -112,4 +113,21 @@ edges:
   detected: '2026-10-21'
   detected_by: mirror-platform-listings.py
   category: FORM_BUILDER
+- partner_name: Airtable (own)
+  partner: airtable
+  partner_match: mirror
+  mirror_match: domain
+  type: marketplace
+  relationship: platform-app
+  direction: third-party
+  channel: partner-built
+  marketplace: own
+  evidence: https://airtable.com/marketplace/blkOJg7nPhfSvO5iE/involve-dot-me
+  mirror_of: airtable/integrations/airtable-integration-edges.yml
+  apps:
+  - involve.me
+  listing_count: 1
+  detected: '2026-10-23'
+  detected_by: mirror-platform-listings.py
+  category: Airtable extension
 templates: []

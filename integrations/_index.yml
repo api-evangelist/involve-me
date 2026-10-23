@@ -88,3 +88,16 @@
   relationship: platform-app
   status: not-a-workflow
   arazzo: null
+- slug: involve-me-airtable-own
+  label: Airtable (own)
+  partner: airtable
+  partner_name: Airtable (own)
+  category: Airtable extension
+  type: marketplace
+  marketplace: own
+  channel: partner-built
+  evidence: https://airtable.com/marketplace/blkOJg7nPhfSvO5iE/involve-dot-me
+  source: edge
+  relationship: platform-app
+  status: not-a-workflow
+  arazzo: null
